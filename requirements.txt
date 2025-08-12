@@ -1,0 +1,9 @@
+pandas
+numpy
+yfinance
+requests
+beautifulsoup4
+transformers
+torch
+tqdm
+python-dateutil

@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+data/
+!data/.gitkeep
+models/
+*.pt
+*.bin
+.ipynb_checkpoints/
+.DS_Store
+*.swp
+key.txt
