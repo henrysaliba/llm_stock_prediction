@@ -1,7 +1,6 @@
 """  Runs: prices -> news -> sentiment
 Outputs:
     data/raw/prices.csv """
- 
 
 import sys
 from pathlib import Path
@@ -13,6 +12,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.utils.config import TICKERS
 from src.data.fetch_price import download_prices, save_prices
 from src.data.fetch_news import gather_news, save_news
+from src.features.sentiment import run_sentiment
 
 
 def main():
@@ -22,6 +22,7 @@ def main():
     news = gather_news(TICKERS)
     save_news(news, "data/raw/news.csv")
 
+    run_sentiment("data/raw/news.csv", "data/processed/news_with_sentiment.csv")
     print("\nData collection system finished.")
 
 if __name__ == "__main__":
