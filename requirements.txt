@@ -7,3 +7,4 @@ transformers
 torch
 tqdm
 python-dateutil
+matplotlib

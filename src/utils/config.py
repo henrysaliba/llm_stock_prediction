@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-TICKERS = ["AAPL", "AMZN", "BTC", "ETH", "NVDA"]
+TICKERS = ["AAPL", "AMZN", "NVDA", "GOOGL", "MSFT"]
 LOOKBACK_DAYS = 90
 
 TODAY = datetime.utcnow().date()

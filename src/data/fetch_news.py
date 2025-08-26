@@ -73,7 +73,15 @@ def gather_news(tickers: List[str]) -> pd.DataFrame:
     return df
 
 def save_news(df: pd.DataFrame, out_path: str):
-    # ensure output dir exists
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    # write to csv
+
+    if os.path.exists(out_path):
+        # load existing file
+        old = pd.read_csv(out_path)
+        # concat new + old
+        df = pd.concat([old, df], ignore_index=True)
+        # drop duplicates across ticker+title+pubDate
+        df = df.drop_duplicates(subset=["ticker", "title", "pubDate"])
+    
+    # always sort by date if you like
     df.to_csv(out_path, index=False)
