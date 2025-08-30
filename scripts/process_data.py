@@ -146,14 +146,15 @@ def merge_sentiment_prices(sent_daily: pd.DataFrame, prices_df: pd.DataFrame) ->
     # left-join so we keep the full price timeline
     merged = prices_df.merge(sent_daily, on=["ticker", "date"], how="left")
 
-    # treat "no news" as 0 when smoothing
-    merged["sentiment_mean_fill0"] = merged["sentiment_mean"].fillna(0.0)
+    # keep NaNs (no-news days) so we don't bias toward zero
     merged = merged.sort_values(["ticker", "date"])
 
-    # simple 7-day rolling mean for visualization / stability
-    merged["sentiment_roll7"] = merged.groupby("ticker")["sentiment_mean_fill0"].transform(
-        lambda s: s.rolling(window=7, min_periods=1).mean()
+    # 7D rolling mean computed only over existing values
+    merged["sentiment_roll7"] = (
+    merged.groupby("ticker")["sentiment_mean"]
+    .transform(lambda s: s.rolling(window=7, min_periods=1).mean())
     )
+
 
     # persist
     merged.to_csv(OUT_PROCESSED_DIR / "sentiment_price_merged.csv", index=False)
@@ -283,29 +284,36 @@ def plot_event_study(merged: pd.DataFrame, horizon: int = 5, pos_q: float = 0.7,
     plt.savefig(OUT_FIG_DIR / "event_study_pos_vs_neg.png", dpi=160)
     plt.close()
 
-
 def plot_overlays_per_ticker(merged: pd.DataFrame) -> None:
-    # visual overlay: price (indexed=100) vs 7D rolling sentiment (scaled)
+    # Plot price vs sentiment with dual y-axes (per ticker)
     for tkr, g in merged.groupby("ticker"):
         g = g.sort_values("date")
         if g.empty:
             continue
 
-        price = g["close"] / g["close"].iloc[0] * 100.0
-        sent = g["sentiment_roll7"].fillna(0.0)
-        sent_scaled = (sent / sent.abs().max() * 100.0) if sent.abs().max() > 0 else sent
+        fig, ax1 = plt.subplots(figsize=(9, 5))
 
-        plt.figure(figsize=(9, 5))
-        plt.plot(g["date"], price, linewidth=2, label="Price (indexed = 100)")
-        plt.plot(g["date"], sent_scaled, linewidth=2, label="7D mean sentiment (scaled)")
+        # Left axis: price
+        ax1.plot(g["date"], g["close"], color="tab:blue", linewidth=2, label="Price")
+        ax1.set_xlabel("Date")
+        ax1.set_ylabel("Price", color="tab:blue")
+        ax1.tick_params(axis="y", labelcolor="tab:blue")
+
+        # Right axis: sentiment (rolling 7-day mean, no rescaling)
+        ax2 = ax1.twinx()
+        ax2.plot(g["date"], g["sentiment_roll7"], color="tab:orange", linewidth=2, label="7D sentiment")
+        ax2.set_ylabel("7D Sentiment (mean)", color="tab:orange")
+        ax2.tick_params(axis="y", labelcolor="tab:orange")
+
+        # Title and grid
         plt.title(f"{tkr}: Price vs 7D Sentiment")
-        plt.xlabel("Date")
-        plt.ylabel("Index / Scaled sentiment")
-        plt.legend()
+        fig.tight_layout()
         plt.grid(True, alpha=0.3)
-        plt.tight_layout()
+
+        # Save
         plt.savefig(OUT_FIG_DIR / f"overlay_{tkr}.png", dpi=160)
         plt.close()
+
 
 
 ## metrics
