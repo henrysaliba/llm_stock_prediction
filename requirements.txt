@@ -8,3 +8,4 @@ torch
 tqdm
 python-dateutil
 matplotlib
+scikit-learn

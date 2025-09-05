@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from __future__ import annotations
 
 from pathlib import Path
@@ -14,8 +13,8 @@ import matplotlib.pyplot as plt
 PRICES_CSV = "data/raw/prices.csv"
 NEWS_SENT_CSV = "data/processed/news_with_sentiment.csv"
 
-OUT_PROCESSED_DIR = Path("data/processed")
-OUT_FIG_DIR = OUT_PROCESSED_DIR / "graphs"
+OUT_PROCESSED_DIR = Path("data/processed/initial")
+OUT_FIG_DIR = Path("data/processed/graphs/initial")
 
 # ensure output dirs exist
 OUT_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
@@ -88,13 +87,8 @@ def load_news_with_sentiment(path: str = NEWS_SENT_CSV) -> pd.DataFrame:
 ## alignment helpers
 
 def map_news_to_trading_day_utc(news_ts_utc: pd.Series, trading_days_date: np.ndarray) -> pd.Series:
-    """
-    map each news timestamp to the NEXT trading day (>= calendar day)
-
-    uses numpy datetime64[D] to avoid tz/NaT issues:
-      - convert news timestamps to UTC midnights (dates only)
-      - searchsorted against sorted trading-day dates
-    """
+    # map each news timestamp to the NEXT trading day (>= calendar day)
+   
     trading_days_np = np.array(trading_days_date, dtype="datetime64[D]")
     news_days_np = news_ts_utc.dt.tz_convert("UTC").dt.normalize().values.astype("datetime64[D]")
 
