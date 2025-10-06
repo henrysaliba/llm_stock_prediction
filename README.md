@@ -18,3 +18,6 @@ build baseline & hybrid
     python3 scripts/build_dataset_hybrid.py
     python3 scripts/train_hybrid.py
 
+compare results
+    python3 scripts/compare_models.py
+
