@@ -1,23 +1,37 @@
-This is my repository for my LLM integration with stock prediction project.
+# Topics in Computer Science – Stock Prediction with LLMs
 
-virtual environment activation, necessary as ubuntu's system python may lack few packages 
+This repo is for my university project on using a Large Language Model to help with stock prediction.
+
+## Setup
+
+Create and activate a virtual environment:
     python3 -m venv .venv
     source .venv/bin/activate
 
-to collect data and gather news sentiment
+Install packages if needed:
+    pip install -r requirements.txt
+
+## Run Steps
+
+Collect data and news sentiment:
     python3 scripts/collect_data.py
 
-to illustrate & further process
+
+Process and visualize:
     python3 scripts/process_data.py
 
 
-
-build baseline & hybrid
+Build and train models:
     python3 scripts/build_dataset_baseline.py
     python3 scripts/train_baseline.py
     python3 scripts/build_dataset_hybrid.py
     python3 scripts/train_hybrid.py
 
-compare results
+
+Compare results:
     python3 scripts/compare_models.py
 
+## Notes
+Baseline = traditional model  
+Hybrid = traditional model + LLM sentiment  
+Results are compared at the end
